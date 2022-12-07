@@ -14,7 +14,6 @@ public class menuManager : MonoBehaviour
     public GameObject infoPage;
     public GameObject exitPage;
 
-    //private int firstRun=0;
     private bool musicToggled=true;
     private bool soundEffToggled=true;
     private float volume =0.8f;
@@ -31,12 +30,22 @@ public class menuManager : MonoBehaviour
 
     private void loadSettings()
     {
-        musicToggled = PlayerPrefs.GetInt("musicToggled")==1 ? true: false;
-        soundEffToggled = PlayerPrefs.GetInt("soundEffToggled")==1 ?true:false;
-        volume = PlayerPrefs.GetFloat("volume");
+        musicToggled = PlayerPrefs.GetInt("musicToggled",1)==1 ? true: false;
+        Toggle musicToggle = GameObject.Find("toggleMusic").GetComponent<Toggle>();
+        musicToggle.isOn = musicToggled;
+
+        soundEffToggled = PlayerPrefs.GetInt("soundEffToggled",1)==1 ?true:false;
+        Toggle soundEffToggle = GameObject.Find("toggleSoundEffects").GetComponent<Toggle>();
+        soundEffToggle.isOn = soundEffToggled;
+
+        volume = PlayerPrefs.GetFloat("volume",0.8f);
+        Slider volumeSlider = GameObject.Find("volumeSlider").GetComponent<Slider>();
+        volumeSlider.value = volume;
+
         resolutionType = PlayerPrefs.GetInt("resolutionType");
 
 
+        //check whether fullscreen shold be turned on when launching the game
         Screen.fullScreen = true;
         Screen.fullScreen = PlayerPrefs.GetInt("fullscreenOn",1)==1 ? true : false;
         Toggle fullScreenToggle = GameObject.Find("toggleFullscreen").GetComponent<Toggle>();
@@ -92,42 +101,40 @@ public class menuManager : MonoBehaviour
 
 
     //audio options
-    public void onMusicToggled()
+    public void onMusicToggled(bool _isToggled)
     {
-        musicToggled = !musicToggled;
+        musicToggled = _isToggled;
         PlayerPrefs.SetInt("musicToggled", musicToggled?1:0);
     }
-    public void onSoundEffToggled()
+    public void onSoundEffToggled(bool _isToggled)
     {
-        soundEffToggled = !soundEffToggled;
+        soundEffToggled = _isToggled;
         PlayerPrefs.SetInt("soundEffToggled", soundEffToggled ? 1 : 0);
     }
-    public void onVolumeChanged(float perc)
+    public void onVolumeChanged(Single perc)
     {
         volume = perc;
-        PlayerPrefs.SetFloat("volume", perc);
+        PlayerPrefs.SetFloat("volume", volume);
     }
 
 
     //graphics options
     public void onFullscreenToggled(bool _isToggled)
     {
-        /*Note that I've implemented fullscreen btn's functionality here.
-        However, we're only requied to save it's value (not actually make it work)*/
         Screen.fullScreen = _isToggled;
         PlayerPrefs.SetInt("fullscreenOn", _isToggled ? 1 : 0);
     }
     public void onResolutionChanged(int type)
     {
         resolutionType = type;
-        PlayerPrefs.SetInt("resolutionType", type); 
+        PlayerPrefs.SetInt("resolutionType", type);
     }
 
 
     //exit options
     public void onSaveAndExit()
     {
-        //saving gamestate disabled for now (only settings are being saved)
+        //saving gamestate disabled (only settings are being saved)
         PlayerPrefs.Save();
         Application.Quit();
     }
